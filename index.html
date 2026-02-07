@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free QR Code Generator — Create QR Codes Online | QRForge</title>
+    <title>QRForge — Free QR Code Generator Online</title>
     <meta name="description" content="Free QR code generator with customization. Create QR codes for URLs, text, WiFi, contacts, and more. Download as PNG or SVG. No signup required.">
     <meta name="keywords" content="free qr code generator, qr code maker, create qr code online, qr code generator no signup, custom qr code">
     
     <!-- Open Graph -->
-    <meta property="og:title" content="Free QR Code Generator | QRForge">
+    <meta property="og:title" content="QRForge — Free QR Code Generator">
     <meta property="og:description" content="Create custom QR codes in seconds. URLs, WiFi, contacts, and more. Free, no signup.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://simplereally.github.io/qr-forge/">
@@ -27,162 +27,797 @@
     }
     </script>
     
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- QR Code Library -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
     
     <style>
-        :root { --pico-font-size: 16px; }
-        .container { max-width: 800px; margin: 0 auto; padding: 2rem 1rem; }
-        .hero { text-align: center; margin-bottom: 2rem; }
-        .hero h1 { margin-bottom: 0.5rem; }
-        .hero p { color: var(--pico-muted-color); }
-        .qr-container { display: flex; gap: 2rem; flex-wrap: wrap; }
-        .qr-form { flex: 1; min-width: 280px; }
-        .qr-preview { flex: 1; min-width: 280px; text-align: center; }
-        #qrcode { background: white; padding: 1rem; border-radius: 8px; display: inline-block; margin-bottom: 1rem; }
-        #qrcode canvas, #qrcode img { max-width: 100%; height: auto; }
-        .btn-group { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
-        .color-inputs { display: flex; gap: 1rem; }
-        .color-inputs label { flex: 1; }
-        .type-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-        .type-tabs button { flex: 1; min-width: 80px; }
-        .type-tabs button.active { background: var(--pico-primary); color: white; }
-        .type-tabs button:not(.active) { background: var(--pico-secondary-background); }
-        .wifi-fields, .contact-fields { display: none; }
-        .wifi-fields.active, .contact-fields.active { display: block; }
-        .watermark { text-align: center; margin-top: 2rem; padding: 1rem; background: var(--pico-card-background-color); border-radius: 8px; }
-        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0; }
-        .feature { text-align: center; padding: 1rem; }
-        .feature h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
-        .pro-badge { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; }
-        footer { text-align: center; margin-top: 3rem; color: var(--pico-muted-color); }
+        /* ═══════════════════════════════════════════════════════════════
+           FORGE DESIGN SYSTEM — Industrial Dark with Molten Accents
+           ═══════════════════════════════════════════════════════════════ */
+        
+        :root {
+            --forge-void: #0a0a0b;
+            --forge-charcoal: #141417;
+            --forge-gunmetal: #1c1c21;
+            --forge-steel: #2a2a32;
+            --forge-iron: #4a4a55;
+            --forge-silver: #8b8b99;
+            --forge-chrome: #c4c4d4;
+            --forge-white: #f0f0f5;
+            
+            --forge-ember: #ff6b35;
+            --forge-flame: #ff8c42;
+            --forge-spark: #ffb366;
+            --forge-heat: #ef4444;
+            --forge-glow: rgba(255, 107, 53, 0.12);
+            --forge-success: #22c55e;
+            
+            --font-display: 'Chakra Petch', sans-serif;
+            --font-body: 'Outfit', sans-serif;
+            
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            
+            --transition-fast: 150ms ease;
+            --transition-normal: 250ms ease;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: var(--font-body);
+            background: var(--forge-void);
+            color: var(--forge-chrome);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        /* ═══════════════ NAVIGATION ═══════════════ */
+        
+        .forge-nav {
+            background: linear-gradient(180deg, var(--forge-charcoal) 0%, transparent 100%);
+            padding: var(--space-md) var(--space-lg);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(12px);
+        }
+        
+        .forge-nav-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .forge-logo {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--forge-white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            letter-spacing: 0.5px;
+        }
+        
+        .forge-logo .icon {
+            font-size: 1.5rem;
+            filter: drop-shadow(0 0 8px var(--forge-ember));
+        }
+        
+        .forge-nav-links {
+            display: flex;
+            gap: var(--space-xs);
+        }
+        
+        .forge-nav-links a {
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--forge-silver);
+            text-decoration: none;
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            transition: var(--transition-fast);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        .forge-nav-links a:hover { color: var(--forge-ember); background: var(--forge-glow); }
+        .forge-nav-links a.active { color: var(--forge-ember); }
+        
+        /* ═══════════════ HEADER ═══════════════ */
+        
+        .forge-header {
+            text-align: center;
+            padding: var(--space-2xl) var(--space-lg);
+            position: relative;
+        }
+        
+        .forge-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 400px;
+            background: radial-gradient(ellipse at center, var(--forge-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .forge-header h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            color: var(--forge-white);
+            margin-bottom: var(--space-sm);
+            letter-spacing: 1px;
+            position: relative;
+        }
+        
+        .forge-header h1 .accent { color: var(--forge-ember); }
+        
+        .forge-header p {
+            font-size: 1.1rem;
+            color: var(--forge-silver);
+            position: relative;
+        }
+        
+        /* ═══════════════ MAIN ═══════════════ */
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg) var(--space-2xl);
+        }
+        
+        .forge-card {
+            background: var(--forge-charcoal);
+            border: 1px solid var(--forge-steel);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.4s ease forwards;
+        }
+        
+        .forge-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--forge-ember), transparent);
+            opacity: 0.5;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* ═══════════════ QR LAYOUT ═══════════════ */
+        
+        .qr-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+        }
+        
+        @media (max-width: 700px) {
+            .qr-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* ═══════════════ TYPE TABS ═══════════════ */
+        
+        .type-tabs {
+            display: flex;
+            gap: var(--space-xs);
+            margin-bottom: var(--space-lg);
+            flex-wrap: wrap;
+        }
+        
+        .type-tabs button {
+            flex: 1;
+            min-width: 70px;
+            font-family: var(--font-display);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            border: 1px solid var(--forge-steel);
+            background: var(--forge-gunmetal);
+            color: var(--forge-silver);
+        }
+        
+        .type-tabs button:hover {
+            border-color: var(--forge-iron);
+            color: var(--forge-white);
+        }
+        
+        .type-tabs button.active {
+            background: linear-gradient(135deg, var(--forge-ember) 0%, var(--forge-flame) 100%);
+            border-color: var(--forge-ember);
+            color: var(--forge-void);
+        }
+        
+        /* ═══════════════ FORM ELEMENTS ═══════════════ */
+        
+        label {
+            display: block;
+            font-family: var(--font-display);
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--forge-silver);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: var(--space-xs);
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            color: var(--forge-white);
+            background: var(--forge-gunmetal);
+            border: 1px solid var(--forge-steel);
+            border-radius: var(--radius-sm);
+            outline: none;
+            transition: var(--transition-fast);
+            margin-bottom: var(--space-md);
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--forge-ember);
+            box-shadow: 0 0 0 3px var(--forge-glow);
+        }
+        
+        input::placeholder { color: var(--forge-iron); }
+        
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b8b99' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right var(--space-md) center;
+            padding-right: var(--space-xl);
+        }
+        
+        input[type="color"] {
+            width: 100%;
+            height: 40px;
+            padding: 2px;
+            cursor: pointer;
+        }
+        
+        /* ═══════════════ DETAILS/SUMMARY ═══════════════ */
+        
+        details {
+            background: var(--forge-gunmetal);
+            border: 1px solid var(--forge-steel);
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--space-md);
+        }
+        
+        summary {
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--forge-silver);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: var(--space-sm) var(--space-md);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        
+        summary:hover { color: var(--forge-ember); }
+        
+        details[open] summary {
+            border-bottom: 1px solid var(--forge-steel);
+            margin-bottom: var(--space-sm);
+        }
+        
+        details > div {
+            padding: var(--space-md);
+        }
+        
+        .color-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-md);
+        }
+        
+        .color-inputs label {
+            margin-bottom: 0;
+        }
+        
+        .color-inputs input {
+            margin-top: var(--space-xs);
+        }
+        
+        /* ═══════════════ CONDITIONAL FIELDS ═══════════════ */
+        
+        .wifi-fields, .contact-fields {
+            display: none;
+        }
+        
+        .wifi-fields.active, .contact-fields.active {
+            display: block;
+        }
+        
+        /* ═══════════════ BUTTONS ═══════════════ */
+        
+        .btn {
+            font-family: var(--font-display);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--forge-ember) 0%, var(--forge-flame) 100%);
+            color: var(--forge-void);
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            width: 100%;
+            padding: var(--space-md);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--forge-gunmetal);
+            color: var(--forge-chrome);
+            border: 1px solid var(--forge-steel);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--forge-steel);
+            border-color: var(--forge-iron);
+        }
+        
+        /* ═══════════════ QR PREVIEW ═══════════════ */
+        
+        .qr-preview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .qr-preview h3 {
+            font-family: var(--font-display);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--forge-ember);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: var(--space-md);
+        }
+        
+        #qrcode {
+            background: var(--forge-white);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            display: inline-block;
+            margin-bottom: var(--space-lg);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        #qrcode canvas, #qrcode img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+        
+        .usage-counter {
+            font-size: 0.85rem;
+            color: var(--forge-silver);
+            margin-top: var(--space-md);
+            text-align: center;
+        }
+        
+        .usage-counter .count {
+            font-family: var(--font-display);
+            color: var(--forge-ember);
+            font-weight: 600;
+        }
+        
+        /* ═══════════════ FEATURES ═══════════════ */
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: var(--space-md);
+        }
+        
+        .feature {
+            background: var(--forge-gunmetal);
+            border: 1px solid var(--forge-steel);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            text-align: center;
+            transition: var(--transition-fast);
+        }
+        
+        .feature:hover {
+            border-color: var(--forge-ember);
+            transform: translateY(-2px);
+        }
+        
+        .feature h4 {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            color: var(--forge-white);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .feature p {
+            font-size: 0.85rem;
+            color: var(--forge-silver);
+        }
+        
+        .pro-badge {
+            background: linear-gradient(135deg, var(--forge-ember) 0%, var(--forge-flame) 100%);
+            color: var(--forge-void);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: var(--font-display);
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: var(--space-xs);
+        }
+        
+        /* ═══════════════ PRO SECTION ═══════════════ */
+        
+        .pro-section {
+            background: var(--forge-charcoal);
+            border: 1px solid var(--forge-steel);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pro-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--forge-ember), var(--forge-flame), var(--forge-spark));
+        }
+        
+        .pro-section h2 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            color: var(--forge-white);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .pro-section .price {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--forge-ember);
+            margin: var(--space-md) 0;
+        }
+        
+        .pro-section p {
+            color: var(--forge-silver);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .pro-section .btn-primary {
+            width: auto;
+            padding: var(--space-md) var(--space-2xl);
+        }
+        
+        /* ═══════════════ WATERMARK ═══════════════ */
+        
+        .watermark {
+            background: var(--forge-gunmetal);
+            border: 1px solid var(--forge-steel);
+            border-radius: var(--radius-md);
+            padding: var(--space-md) var(--space-lg);
+            text-align: center;
+            margin-bottom: var(--space-xl);
+        }
+        
+        .watermark p {
+            margin: var(--space-xs) 0;
+            font-size: 0.9rem;
+        }
+        
+        .watermark a {
+            color: var(--forge-ember);
+            text-decoration: none;
+        }
+        
+        .watermark a:hover {
+            text-decoration: underline;
+        }
+        
+        /* ═══════════════ FOOTER ═══════════════ */
+        
+        .forge-footer {
+            background: var(--forge-charcoal);
+            border-top: 1px solid var(--forge-steel);
+            padding: var(--space-xl) var(--space-lg);
+            margin-top: var(--space-2xl);
+        }
+        
+        .forge-footer-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+        
+        .forge-footer-tools {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .forge-footer-tools a {
+            font-family: var(--font-display);
+            font-size: 0.8rem;
+            color: var(--forge-silver);
+            text-decoration: none;
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            transition: var(--transition-fast);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .forge-footer-tools a:hover { color: var(--forge-ember); }
+        
+        .forge-footer-meta {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--forge-iron);
+        }
+        
+        .forge-footer-meta a {
+            color: var(--forge-ember);
+            text-decoration: none;
+        }
+        
+        .forge-footer-meta a:hover { text-decoration: underline; }
+        
+        /* ═══════════════ RESPONSIVE ═══════════════ */
+        
+        @media (max-width: 700px) {
+            .forge-nav-links a {
+                font-size: 0.7rem;
+                padding: var(--space-xs);
+            }
+        }
     </style>
 </head>
 <body>
+    <nav class="forge-nav">
+        <div class="forge-nav-inner">
+            <a href="https://simplereally.github.io/invoice-forge/" class="forge-logo">
+                <span class="icon">🔥</span>
+                <span>FORGE</span>
+            </a>
+            <div class="forge-nav-links">
+                <a href="https://simplereally.github.io/invoice-forge/">Invoice</a>
+                <a href="https://simplereally.github.io/qr-forge/" class="active">QR</a>
+                <a href="https://simplereally.github.io/pass-forge/">Pass</a>
+                <a href="https://simplereally.github.io/color-forge/">Color</a>
+                <a href="https://simplereally.github.io/readme-forge/">Readme</a>
+            </div>
+        </div>
+    </nav>
+    
+    <header class="forge-header">
+        <h1>QR<span class="accent">Forge</span></h1>
+        <p>Generate QR codes in seconds — no signup required</p>
+    </header>
+    
     <main class="container">
-        <div class="hero">
-            <h1>🔲 QRForge</h1>
-            <p>Free QR Code Generator — No Signup Required</p>
-        </div>
-        
-        <div class="qr-container">
-            <div class="qr-form">
-                <div class="type-tabs">
-                    <button class="active" data-type="url">URL</button>
-                    <button data-type="text">Text</button>
-                    <button data-type="wifi">WiFi</button>
-                    <button data-type="contact">Contact</button>
-                </div>
-                
-                <div id="url-input">
-                    <label for="content">URL or Text</label>
-                    <input type="text" id="content" placeholder="https://example.com" value="https://example.com">
-                </div>
-                
-                <div class="wifi-fields" id="wifi-fields">
-                    <label for="wifi-ssid">Network Name (SSID)</label>
-                    <input type="text" id="wifi-ssid" placeholder="MyWiFi">
-                    <label for="wifi-password">Password</label>
-                    <input type="text" id="wifi-password" placeholder="password123">
-                    <label for="wifi-encryption">Encryption</label>
-                    <select id="wifi-encryption">
-                        <option value="WPA">WPA/WPA2</option>
-                        <option value="WEP">WEP</option>
-                        <option value="nopass">None</option>
-                    </select>
-                </div>
-                
-                <div class="contact-fields" id="contact-fields">
-                    <label for="contact-name">Full Name</label>
-                    <input type="text" id="contact-name" placeholder="John Doe">
-                    <label for="contact-phone">Phone</label>
-                    <input type="text" id="contact-phone" placeholder="+1234567890">
-                    <label for="contact-email">Email</label>
-                    <input type="email" id="contact-email" placeholder="john@example.com">
-                </div>
-                
-                <details>
-                    <summary>Customize Colors</summary>
-                    <div class="color-inputs">
-                        <label>
-                            Foreground
-                            <input type="color" id="fg-color" value="#000000">
-                        </label>
-                        <label>
-                            Background
-                            <input type="color" id="bg-color" value="#ffffff">
-                        </label>
+        <div class="forge-card">
+            <div class="qr-container">
+                <div class="qr-form">
+                    <div class="type-tabs">
+                        <button class="active" data-type="url">URL</button>
+                        <button data-type="text">Text</button>
+                        <button data-type="wifi">WiFi</button>
+                        <button data-type="contact">Contact</button>
                     </div>
-                </details>
-                
-                <details>
-                    <summary>Size & Error Correction</summary>
-                    <label for="size">Size</label>
-                    <select id="size">
-                        <option value="4">Small (132px)</option>
-                        <option value="6" selected>Medium (198px)</option>
-                        <option value="8">Large (264px)</option>
-                        <option value="10">Extra Large (330px)</option>
-                    </select>
-                    <label for="error-correction">Error Correction</label>
-                    <select id="error-correction">
-                        <option value="L">Low (7%)</option>
-                        <option value="M" selected>Medium (15%)</option>
-                        <option value="Q">Quartile (25%)</option>
-                        <option value="H">High (30%)</option>
-                    </select>
-                </details>
-                
-                <button onclick="generateQR()">Generate QR Code</button>
-            </div>
-            
-            <div class="qr-preview">
-                <h3>Preview</h3>
-                <div id="qrcode"></div>
-                <div class="btn-group">
-                    <button onclick="downloadQR('png')" class="secondary">Download PNG</button>
-                    <button onclick="downloadQR('svg')" class="secondary">Download SVG</button>
+                    
+                    <div id="url-input">
+                        <label for="content">URL or Text</label>
+                        <input type="text" id="content" placeholder="https://example.com" value="https://example.com">
+                    </div>
+                    
+                    <div class="wifi-fields" id="wifi-fields">
+                        <label for="wifi-ssid">Network Name (SSID)</label>
+                        <input type="text" id="wifi-ssid" placeholder="MyWiFi">
+                        <label for="wifi-password">Password</label>
+                        <input type="text" id="wifi-password" placeholder="password123">
+                        <label for="wifi-encryption">Encryption</label>
+                        <select id="wifi-encryption">
+                            <option value="WPA">WPA/WPA2</option>
+                            <option value="WEP">WEP</option>
+                            <option value="nopass">None</option>
+                        </select>
+                    </div>
+                    
+                    <div class="contact-fields" id="contact-fields">
+                        <label for="contact-name">Full Name</label>
+                        <input type="text" id="contact-name" placeholder="John Doe">
+                        <label for="contact-phone">Phone</label>
+                        <input type="text" id="contact-phone" placeholder="+1234567890">
+                        <label for="contact-email">Email</label>
+                        <input type="email" id="contact-email" placeholder="john@example.com">
+                    </div>
+                    
+                    <details>
+                        <summary>Customize Colors</summary>
+                        <div class="color-inputs">
+                            <label>
+                                Foreground
+                                <input type="color" id="fg-color" value="#000000">
+                            </label>
+                            <label>
+                                Background
+                                <input type="color" id="bg-color" value="#ffffff">
+                            </label>
+                        </div>
+                    </details>
+                    
+                    <details>
+                        <summary>Size & Error Correction</summary>
+                        <div>
+                            <label for="size">Size</label>
+                            <select id="size">
+                                <option value="4">Small (132px)</option>
+                                <option value="6" selected>Medium (198px)</option>
+                                <option value="8">Large (264px)</option>
+                                <option value="10">Extra Large (330px)</option>
+                            </select>
+                            <label for="error-correction">Error Correction</label>
+                            <select id="error-correction">
+                                <option value="L">Low (7%)</option>
+                                <option value="M" selected>Medium (15%)</option>
+                                <option value="Q">Quartile (25%)</option>
+                                <option value="H">High (30%)</option>
+                            </select>
+                        </div>
+                    </details>
+                    
+                    <button class="btn btn-primary" onclick="generateQR()">⚡ Generate QR Code</button>
                 </div>
-                <p id="usage-counter" style="font-size: 0.9rem; color: var(--pico-muted-color); margin-top: 1rem;"></p>
+                
+                <div class="qr-preview">
+                    <h3>Preview</h3>
+                    <div id="qrcode"></div>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="downloadQR('png')">📥 PNG</button>
+                        <button class="btn btn-secondary" onclick="downloadQR('svg')">📥 SVG</button>
+                    </div>
+                    <p class="usage-counter"><span class="count" id="usage-count">5</span> free QR codes remaining today</p>
+                </div>
             </div>
         </div>
         
-        <div class="watermark" id="watermark">
+        <div class="watermark">
             <p>⭐ <strong>Free tier:</strong> 5 QR codes per day</p>
             <p><a href="#pro">Upgrade to Pro</a> for unlimited QR codes, analytics, and custom branding</p>
         </div>
         
-        <div class="features">
-            <div class="feature">
-                <h3>🔗 Multiple Formats</h3>
-                <p>URLs, text, WiFi networks, contact cards</p>
-            </div>
-            <div class="feature">
-                <h3>🎨 Customizable</h3>
-                <p>Colors, sizes, error correction levels</p>
-            </div>
-            <div class="feature">
-                <h3>📥 Easy Download</h3>
-                <p>PNG and SVG formats</p>
-            </div>
-            <div class="feature">
-                <h3>📊 Analytics <span class="pro-badge">PRO</span></h3>
-                <p>Track scans, locations, devices</p>
+        <div class="forge-card">
+            <div class="features">
+                <div class="feature">
+                    <h4>🔗 Multiple Formats</h4>
+                    <p>URLs, text, WiFi networks, contact cards</p>
+                </div>
+                <div class="feature">
+                    <h4>🎨 Customizable</h4>
+                    <p>Colors, sizes, error correction levels</p>
+                </div>
+                <div class="feature">
+                    <h4>📥 Easy Download</h4>
+                    <p>PNG and SVG formats</p>
+                </div>
+                <div class="feature">
+                    <h4>📊 Analytics <span class="pro-badge">PRO</span></h4>
+                    <p>Track scans, locations, devices</p>
+                </div>
             </div>
         </div>
         
-        <section id="pro" style="text-align: center; padding: 2rem; background: var(--pico-card-background-color); border-radius: 8px; margin-top: 2rem;">
+        <section id="pro" class="pro-section">
             <h2>🚀 QRForge Pro</h2>
             <p>Unlimited QR codes • Scan analytics • Custom branding • Priority support</p>
-            <p style="font-size: 1.5rem; font-weight: bold;">$7/month</p>
-            <button onclick="alert('Pro upgrade coming soon! Payment integration in progress.')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">Upgrade to Pro</button>
+            <div class="price">$7/month</div>
+            <button class="btn btn-primary" onclick="alert('Pro upgrade coming soon! Payment integration in progress.')">Upgrade to Pro</button>
         </section>
-        
-        <footer>
-            <p>Built with ❤️ by <a href="https://github.com/Simplereally">Simplereally</a></p>
-            <p>Part of the <a href="https://simplereally.github.io/invoice-forge/">Forge</a> tool collection</p>
-        </footer>
     </main>
+    
+    <footer class="forge-footer">
+        <div class="forge-footer-inner">
+            <div class="forge-footer-tools">
+                <a href="https://simplereally.github.io/invoice-forge/">InvoiceForge</a>
+                <a href="https://simplereally.github.io/qr-forge/">QRForge</a>
+                <a href="https://simplereally.github.io/pass-forge/">PassForge</a>
+                <a href="https://simplereally.github.io/color-forge/">ColorForge</a>
+                <a href="https://simplereally.github.io/readme-forge/">ReadmeForge</a>
+            </div>
+            <div class="forge-footer-meta">
+                <p>Made with 🔥 by <a href="https://github.com/Simplereally">Simplereally</a></p>
+            </div>
+        </div>
+    </footer>
     
     <script>
         let currentType = 'url';
@@ -250,7 +885,7 @@
         
         function generateQR() {
             if (dailyCount >= 5) {
-                document.getElementById('qrcode').innerHTML = '<p style="color: red;">Daily limit reached. <a href="#pro">Upgrade to Pro</a> for unlimited.</p>';
+                document.getElementById('qrcode').innerHTML = '<p style="color: var(--forge-heat); padding: 2rem;">Daily limit reached. <a href="#pro" style="color: var(--forge-ember);">Upgrade to Pro</a> for unlimited.</p>';
                 return;
             }
             
@@ -343,9 +978,9 @@
         
         function updateUsageCounter() {
             const remaining = Math.max(0, 5 - dailyCount);
-            document.getElementById('usage-counter').textContent = `${remaining} free QR codes remaining today`;
+            document.getElementById('usage-count').textContent = remaining;
             if (remaining === 0) {
-                document.getElementById('watermark').innerHTML = '<p style="color: orange;">⚠️ Daily limit reached. <a href="#pro">Upgrade to Pro</a> for unlimited QR codes!</p>';
+                document.querySelector('.watermark').innerHTML = '<p style="color: var(--forge-flame);">⚠️ Daily limit reached. <a href="#pro">Upgrade to Pro</a> for unlimited QR codes!</p>';
             }
         }
         
