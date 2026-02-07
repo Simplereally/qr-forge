@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free QR Code Generator — Create QR Codes Online | QRForge</title>
+    <meta name="description" content="Free QR code generator with customization. Create QR codes for URLs, text, WiFi, contacts, and more. Download as PNG or SVG. No signup required.">
+    <meta name="keywords" content="free qr code generator, qr code maker, create qr code online, qr code generator no signup, custom qr code">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Free QR Code Generator | QRForge">
+    <meta property="og:description" content="Create custom QR codes in seconds. URLs, WiFi, contacts, and more. Free, no signup.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://simplereally.github.io/qr-forge/">
+    
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "QRForge",
+        "description": "Free online QR code generator with customization options",
+        "url": "https://simplereally.github.io/qr-forge/",
+        "applicationCategory": "UtilityApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}
+    }
+    </script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    
+    <style>
+        :root { --pico-font-size: 16px; }
+        .container { max-width: 800px; margin: 0 auto; padding: 2rem 1rem; }
+        .hero { text-align: center; margin-bottom: 2rem; }
+        .hero h1 { margin-bottom: 0.5rem; }
+        .hero p { color: var(--pico-muted-color); }
+        .qr-container { display: flex; gap: 2rem; flex-wrap: wrap; }
+        .qr-form { flex: 1; min-width: 280px; }
+        .qr-preview { flex: 1; min-width: 280px; text-align: center; }
+        #qrcode { background: white; padding: 1rem; border-radius: 8px; display: inline-block; margin-bottom: 1rem; }
+        #qrcode canvas, #qrcode img { max-width: 100%; height: auto; }
+        .btn-group { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
+        .color-inputs { display: flex; gap: 1rem; }
+        .color-inputs label { flex: 1; }
+        .type-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .type-tabs button { flex: 1; min-width: 80px; }
+        .type-tabs button.active { background: var(--pico-primary); color: white; }
+        .type-tabs button:not(.active) { background: var(--pico-secondary-background); }
+        .wifi-fields, .contact-fields { display: none; }
+        .wifi-fields.active, .contact-fields.active { display: block; }
+        .watermark { text-align: center; margin-top: 2rem; padding: 1rem; background: var(--pico-card-background-color); border-radius: 8px; }
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0; }
+        .feature { text-align: center; padding: 1rem; }
+        .feature h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+        .pro-badge { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; }
+        footer { text-align: center; margin-top: 3rem; color: var(--pico-muted-color); }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <div class="hero">
+            <h1>🔲 QRForge</h1>
+            <p>Free QR Code Generator — No Signup Required</p>
+        </div>
+        
+        <div class="qr-container">
+            <div class="qr-form">
+                <div class="type-tabs">
+                    <button class="active" data-type="url">URL</button>
+                    <button data-type="text">Text</button>
+                    <button data-type="wifi">WiFi</button>
+                    <button data-type="contact">Contact</button>
+                </div>
+                
+                <div id="url-input">
+                    <label for="content">URL or Text</label>
+                    <input type="text" id="content" placeholder="https://example.com" value="https://example.com">
+                </div>
+                
+                <div class="wifi-fields" id="wifi-fields">
+                    <label for="wifi-ssid">Network Name (SSID)</label>
+                    <input type="text" id="wifi-ssid" placeholder="MyWiFi">
+                    <label for="wifi-password">Password</label>
+                    <input type="text" id="wifi-password" placeholder="password123">
+                    <label for="wifi-encryption">Encryption</label>
+                    <select id="wifi-encryption">
+                        <option value="WPA">WPA/WPA2</option>
+                        <option value="WEP">WEP</option>
+                        <option value="nopass">None</option>
+                    </select>
+                </div>
+                
+                <div class="contact-fields" id="contact-fields">
+                    <label for="contact-name">Full Name</label>
+                    <input type="text" id="contact-name" placeholder="John Doe">
+                    <label for="contact-phone">Phone</label>
+                    <input type="text" id="contact-phone" placeholder="+1234567890">
+                    <label for="contact-email">Email</label>
+                    <input type="email" id="contact-email" placeholder="john@example.com">
+                </div>
+                
+                <details>
+                    <summary>Customize Colors</summary>
+                    <div class="color-inputs">
+                        <label>
+                            Foreground
+                            <input type="color" id="fg-color" value="#000000">
+                        </label>
+                        <label>
+                            Background
+                            <input type="color" id="bg-color" value="#ffffff">
+                        </label>
+                    </div>
+                </details>
+                
+                <details>
+                    <summary>Size & Error Correction</summary>
+                    <label for="size">Size</label>
+                    <select id="size">
+                        <option value="4">Small (132px)</option>
+                        <option value="6" selected>Medium (198px)</option>
+                        <option value="8">Large (264px)</option>
+                        <option value="10">Extra Large (330px)</option>
+                    </select>
+                    <label for="error-correction">Error Correction</label>
+                    <select id="error-correction">
+                        <option value="L">Low (7%)</option>
+                        <option value="M" selected>Medium (15%)</option>
+                        <option value="Q">Quartile (25%)</option>
+                        <option value="H">High (30%)</option>
+                    </select>
+                </details>
+                
+                <button onclick="generateQR()">Generate QR Code</button>
+            </div>
+            
+            <div class="qr-preview">
+                <h3>Preview</h3>
+                <div id="qrcode"></div>
+                <div class="btn-group">
+                    <button onclick="downloadQR('png')" class="secondary">Download PNG</button>
+                    <button onclick="downloadQR('svg')" class="secondary">Download SVG</button>
+                </div>
+                <p id="usage-counter" style="font-size: 0.9rem; color: var(--pico-muted-color); margin-top: 1rem;"></p>
+            </div>
+        </div>
+        
+        <div class="watermark" id="watermark">
+            <p>⭐ <strong>Free tier:</strong> 5 QR codes per day</p>
+            <p><a href="#pro">Upgrade to Pro</a> for unlimited QR codes, analytics, and custom branding</p>
+        </div>
+        
+        <div class="features">
+            <div class="feature">
+                <h3>🔗 Multiple Formats</h3>
+                <p>URLs, text, WiFi networks, contact cards</p>
+            </div>
+            <div class="feature">
+                <h3>🎨 Customizable</h3>
+                <p>Colors, sizes, error correction levels</p>
+            </div>
+            <div class="feature">
+                <h3>📥 Easy Download</h3>
+                <p>PNG and SVG formats</p>
+            </div>
+            <div class="feature">
+                <h3>📊 Analytics <span class="pro-badge">PRO</span></h3>
+                <p>Track scans, locations, devices</p>
+            </div>
+        </div>
+        
+        <section id="pro" style="text-align: center; padding: 2rem; background: var(--pico-card-background-color); border-radius: 8px; margin-top: 2rem;">
+            <h2>🚀 QRForge Pro</h2>
+            <p>Unlimited QR codes • Scan analytics • Custom branding • Priority support</p>
+            <p style="font-size: 1.5rem; font-weight: bold;">$7/month</p>
+            <button onclick="alert('Pro upgrade coming soon! Payment integration in progress.')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">Upgrade to Pro</button>
+        </section>
+        
+        <footer>
+            <p>Built with ❤️ by <a href="https://github.com/Simplereally">Simplereally</a></p>
+            <p>Part of the <a href="https://simplereally.github.io/invoice-forge/">Forge</a> tool collection</p>
+        </footer>
+    </main>
+    
+    <script>
+        let currentType = 'url';
+        let dailyCount = parseInt(localStorage.getItem('qr_daily_count') || '0');
+        let lastDate = localStorage.getItem('qr_last_date');
+        const today = new Date().toDateString();
+        
+        if (lastDate !== today) {
+            dailyCount = 0;
+            localStorage.setItem('qr_last_date', today);
+            localStorage.setItem('qr_daily_count', '0');
+        }
+        
+        updateUsageCounter();
+        
+        // Type tabs
+        document.querySelectorAll('.type-tabs button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.type-tabs button').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentType = btn.dataset.type;
+                
+                document.getElementById('url-input').style.display = currentType === 'url' || currentType === 'text' ? 'block' : 'none';
+                document.getElementById('wifi-fields').classList.toggle('active', currentType === 'wifi');
+                document.getElementById('contact-fields').classList.toggle('active', currentType === 'contact');
+                
+                if (currentType === 'text') {
+                    document.getElementById('content').placeholder = 'Enter any text...';
+                } else if (currentType === 'url') {
+                    document.getElementById('content').placeholder = 'https://example.com';
+                }
+            });
+        });
+        
+        // Generate QR on input change
+        document.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('change', generateQR);
+            el.addEventListener('input', debounce(generateQR, 300));
+        });
+        
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+        
+        function getQRContent() {
+            switch(currentType) {
+                case 'wifi':
+                    const ssid = document.getElementById('wifi-ssid').value;
+                    const pass = document.getElementById('wifi-password').value;
+                    const enc = document.getElementById('wifi-encryption').value;
+                    return `WIFI:T:${enc};S:${ssid};P:${pass};;`;
+                case 'contact':
+                    const name = document.getElementById('contact-name').value;
+                    const phone = document.getElementById('contact-phone').value;
+                    const email = document.getElementById('contact-email').value;
+                    return `BEGIN:VCARD\nVERSION:3.0\nN:${name}\nTEL:${phone}\nEMAIL:${email}\nEND:VCARD`;
+                default:
+                    return document.getElementById('content').value;
+            }
+        }
+        
+        function generateQR() {
+            if (dailyCount >= 5) {
+                document.getElementById('qrcode').innerHTML = '<p style="color: red;">Daily limit reached. <a href="#pro">Upgrade to Pro</a> for unlimited.</p>';
+                return;
+            }
+            
+            const content = getQRContent();
+            if (!content) return;
+            
+            const size = parseInt(document.getElementById('size').value);
+            const errorLevel = document.getElementById('error-correction').value;
+            const fgColor = document.getElementById('fg-color').value;
+            const bgColor = document.getElementById('bg-color').value;
+            
+            const qr = qrcode(0, errorLevel);
+            qr.addData(content);
+            qr.make();
+            
+            const moduleCount = qr.getModuleCount();
+            const cellSize = size;
+            const margin = cellSize;
+            const imgSize = moduleCount * cellSize + margin * 2;
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = imgSize;
+            canvas.height = imgSize;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, imgSize, imgSize);
+            
+            ctx.fillStyle = fgColor;
+            for (let row = 0; row < moduleCount; row++) {
+                for (let col = 0; col < moduleCount; col++) {
+                    if (qr.isDark(row, col)) {
+                        ctx.fillRect(
+                            col * cellSize + margin,
+                            row * cellSize + margin,
+                            cellSize,
+                            cellSize
+                        );
+                    }
+                }
+            }
+            
+            document.getElementById('qrcode').innerHTML = '';
+            document.getElementById('qrcode').appendChild(canvas);
+            
+            window.currentQR = { canvas, content, moduleCount, cellSize, margin, fgColor, bgColor };
+        }
+        
+        function downloadQR(format) {
+            if (!window.currentQR) {
+                alert('Generate a QR code first!');
+                return;
+            }
+            
+            dailyCount++;
+            localStorage.setItem('qr_daily_count', dailyCount.toString());
+            updateUsageCounter();
+            
+            const { canvas, content, moduleCount, cellSize, margin, fgColor, bgColor } = window.currentQR;
+            
+            if (format === 'png') {
+                const link = document.createElement('a');
+                link.download = 'qrcode.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } else if (format === 'svg') {
+                let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${canvas.width} ${canvas.height}">`;
+                svg += `<rect width="100%" height="100%" fill="${bgColor}"/>`;
+                
+                const qr = qrcode(0, document.getElementById('error-correction').value);
+                qr.addData(content);
+                qr.make();
+                
+                for (let row = 0; row < moduleCount; row++) {
+                    for (let col = 0; col < moduleCount; col++) {
+                        if (qr.isDark(row, col)) {
+                            svg += `<rect x="${col * cellSize + margin}" y="${row * cellSize + margin}" width="${cellSize}" height="${cellSize}" fill="${fgColor}"/>`;
+                        }
+                    }
+                }
+                svg += '</svg>';
+                
+                const blob = new Blob([svg], { type: 'image/svg+xml' });
+                const link = document.createElement('a');
+                link.download = 'qrcode.svg';
+                link.href = URL.createObjectURL(blob);
+                link.click();
+            }
+        }
+        
+        function updateUsageCounter() {
+            const remaining = Math.max(0, 5 - dailyCount);
+            document.getElementById('usage-counter').textContent = `${remaining} free QR codes remaining today`;
+            if (remaining === 0) {
+                document.getElementById('watermark').innerHTML = '<p style="color: orange;">⚠️ Daily limit reached. <a href="#pro">Upgrade to Pro</a> for unlimited QR codes!</p>';
+            }
+        }
+        
+        // Generate initial QR
+        generateQR();
+    </script>
+</body>
+</html>
