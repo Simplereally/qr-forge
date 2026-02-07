@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free QR Code Generator Online - Create Custom QR Codes | QRForge</title>
-    <meta name="description" content="Generate free QR codes instantly for URLs, WiFi, contacts & text. Customize colors, download PNG/SVG. No signup required. Create your QR code now!">
+    <meta name="description" content="Generate free QR codes instantly for URLs, WiFi, contacts & text. Customize colors, styles, add logos. Download PNG/SVG/PDF. No signup required!">
     <meta name="keywords" content="free qr code generator, qr code maker online, create qr code, wifi qr code, custom qr code generator, qr code download png svg">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://simplereally.github.io/qr-forge/">
@@ -40,58 +40,6 @@
 }
     </script>
     
-    <!-- Schema.org FAQ -->
-    <script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-        {
-            "@type": "Question",
-            "name": "Is QRForge free to use?",
-            "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Yes! QRForge offers 5 free QR codes per day. For unlimited generation and advanced features, upgrade to Pro for $2.99 one-time."
-            }
-        },
-        {
-            "@type": "Question",
-            "name": "What types of QR codes can I create?",
-            "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "You can create QR codes for URLs, plain text, WiFi networks, and contact cards (vCards)."
-            }
-        },
-        {
-            "@type": "Question",
-            "name": "What formats can I download?",
-            "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "QR codes can be downloaded as PNG or SVG files for maximum flexibility."
-            }
-        },
-        {
-            "@type": "Question",
-            "name": "Can I customize QR code colors?",
-            "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Yes, Pro users can customize foreground and background colors for branded QR codes."
-            }
-        },
-        {
-            "@type": "Question",
-            "name": "Do QR codes expire?",
-            "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "No, QR codes created with QRForge never expire. They work forever once generated."
-            }
-        }
-    ]
-}
-    </script>
-    
-    
-    
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -99,6 +47,8 @@
     
     <!-- QR Code Library -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <!-- jsPDF for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
         /* ═══════════════════════════════════════════════════════════════
@@ -202,6 +152,7 @@
         .forge-nav-links {
             display: flex;
             gap: var(--space-xs);
+            flex-wrap: wrap;
         }
         
         .forge-nav-links a {
@@ -261,7 +212,7 @@
         /* ═══════════════ MAIN ═══════════════ */
         
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 0 var(--space-lg) var(--space-2xl);
         }
@@ -301,7 +252,7 @@
             gap: var(--space-xl);
         }
         
-        @media (max-width: 700px) {
+        @media (max-width: 800px) {
             .qr-container {
                 grid-template-columns: 1fr;
             }
@@ -394,97 +345,185 @@
             cursor: pointer;
         }
         
-        /* ═══════════════ DETAILS/SUMMARY ═══════════════ */
+        /* ═══════════════ STYLE OPTIONS ═══════════════ */
         
-        details {
-            background: var(--forge-gunmetal);
-            border: 1px solid var(--forge-steel);
-            border-radius: var(--radius-sm);
-            margin-bottom: var(--space-md);
-        }
-        
-        summary {
+        .section-title {
             font-family: var(--font-display);
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 600;
-            color: var(--forge-silver);
+            color: var(--forge-ember);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: var(--space-sm) var(--space-md);
-            cursor: pointer;
-            transition: var(--transition-fast);
+            letter-spacing: 1px;
+            margin-bottom: var(--space-md);
+            padding-bottom: var(--space-sm);
+            border-bottom: 1px solid var(--forge-steel);
             display: flex;
             align-items: center;
             gap: var(--space-sm);
         }
         
-        summary:hover { color: var(--forge-ember); }
-        
-        details[open] summary {
-            border-bottom: 1px solid var(--forge-steel);
-            margin-bottom: var(--space-sm);
+        .style-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-sm);
+            margin-bottom: var(--space-md);
         }
         
-        details > div {
-            padding: var(--space-md);
+        .style-option {
+            padding: var(--space-sm);
+            background: var(--forge-gunmetal);
+            border: 2px solid var(--forge-steel);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            text-align: center;
         }
         
-        .color-inputs {
+        .style-option:hover {
+            border-color: var(--forge-iron);
+        }
+        
+        .style-option.active {
+            border-color: var(--forge-ember);
+            background: var(--forge-glow);
+        }
+        
+        .style-option span {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .style-option small {
+            font-family: var(--font-display);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: var(--forge-silver);
+        }
+        
+        .color-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: var(--space-md);
+            margin-bottom: var(--space-md);
         }
         
-        .color-inputs label {
-            margin-bottom: 0;
+        /* ═══════════════ LOGO UPLOAD ═══════════════ */
+        
+        .logo-upload-section {
+            margin-bottom: var(--space-md);
         }
         
-        .color-inputs input {
-            margin-top: var(--space-xs);
-        }
-        
-        /* ═══════════════ PRO BADGE ═══════════════ */
-        
-        .pro-badge {
-            background: linear-gradient(135deg, var(--forge-ember) 0%, var(--forge-flame) 100%);
-            color: var(--forge-void);
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-family: var(--font-display);
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-left: var(--space-xs);
+        .logo-upload {
+            border: 2px dashed var(--forge-steel);
+            border-radius: var(--radius-sm);
+            padding: var(--space-md);
+            text-align: center;
             cursor: pointer;
+            transition: var(--transition-fast);
             position: relative;
-            overflow: hidden;
         }
         
-        .pro-badge::before {
-            content: '';
+        .logo-upload:hover {
+            border-color: var(--forge-ember);
+        }
+        
+        .logo-upload.has-logo {
+            padding: var(--space-sm);
+        }
+        
+        .logo-upload img {
+            max-width: 60px;
+            max-height: 60px;
+            object-fit: contain;
+        }
+        
+        .logo-upload input {
+            display: none;
+        }
+        
+        .logo-upload-text {
+            font-size: 0.8rem;
+            color: var(--forge-silver);
+        }
+        
+        .logo-upload-text span {
+            color: var(--forge-ember);
+        }
+        
+        .remove-logo {
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            animation: shimmer 2s infinite;
-        }
-        
-        @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
+            top: 4px;
+            right: 4px;
+            background: var(--forge-heat);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            line-height: 1;
         }
         
         /* ═══════════════ CONDITIONAL FIELDS ═══════════════ */
         
-        .wifi-fields, .contact-fields {
+        .wifi-fields, .contact-fields, .batch-fields {
             display: none;
         }
         
-        .wifi-fields.active, .contact-fields.active {
+        .wifi-fields.active, .contact-fields.active, .batch-fields.active {
             display: block;
+        }
+        
+        /* ═══════════════ BATCH MODE ═══════════════ */
+        
+        .batch-toggle {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-md);
+            padding: var(--space-sm);
+            background: var(--forge-gunmetal);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+        }
+        
+        .batch-toggle input {
+            width: auto;
+            margin: 0;
+        }
+        
+        .batch-toggle span {
+            font-size: 0.9rem;
+        }
+        
+        .batch-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+        }
+        
+        .batch-item {
+            background: var(--forge-gunmetal);
+            border: 1px solid var(--forge-steel);
+            border-radius: var(--radius-sm);
+            padding: var(--space-sm);
+            text-align: center;
+        }
+        
+        .batch-item canvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--radius-sm);
+        }
+        
+        .batch-item p {
+            font-size: 0.7rem;
+            color: var(--forge-silver);
+            margin-top: var(--space-xs);
+            word-break: break-all;
         }
         
         /* ═══════════════ BUTTONS ═══════════════ */
@@ -549,24 +588,69 @@
         }
         
         #qrcode {
-            background: var(--forge-white);
             padding: var(--space-lg);
             border-radius: var(--radius-md);
             display: inline-block;
             margin-bottom: var(--space-lg);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
         }
         
-        #qrcode canvas, #qrcode img {
+        #qrcode canvas {
             display: block;
             max-width: 100%;
             height: auto;
         }
         
-        .btn-group {
+        .download-section {
+            width: 100%;
+        }
+        
+        .download-size-label {
+            font-family: var(--font-display);
+            font-size: 0.75rem;
+            color: var(--forge-silver);
+            text-transform: uppercase;
+            margin-bottom: var(--space-sm);
+            display: block;
+        }
+        
+        .size-buttons {
             display: flex;
-            gap: var(--space-sm);
+            gap: var(--space-xs);
+            margin-bottom: var(--space-md);
             flex-wrap: wrap;
+        }
+        
+        .size-btn {
+            flex: 1;
+            min-width: 60px;
+            padding: var(--space-xs) var(--space-sm);
+            font-family: var(--font-display);
+            font-size: 0.7rem;
+            background: var(--forge-gunmetal);
+            border: 1px solid var(--forge-steel);
+            border-radius: var(--radius-sm);
+            color: var(--forge-silver);
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+        
+        .size-btn:hover {
+            border-color: var(--forge-ember);
+            color: var(--forge-ember);
+        }
+        
+        .size-btn.active {
+            background: var(--forge-ember);
+            border-color: var(--forge-ember);
+            color: var(--forge-void);
+        }
+        
+        .btn-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-sm);
         }
         
         .usage-counter {
@@ -580,6 +664,40 @@
             font-family: var(--font-display);
             color: var(--forge-ember);
             font-weight: 600;
+        }
+        
+        /* ═══════════════ PRO BADGE ═══════════════ */
+        
+        .pro-badge {
+            background: linear-gradient(135deg, var(--forge-ember) 0%, var(--forge-flame) 100%);
+            color: var(--forge-void);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: var(--font-display);
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: var(--space-xs);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pro-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
         
         /* ═══════════════ FEATURES ═══════════════ */
@@ -791,6 +909,14 @@
                 font-size: 0.7rem;
                 padding: var(--space-xs);
             }
+            
+            .style-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .btn-group {
+                grid-template-columns: 1fr 1fr;
+            }
         }
     </style>
 </head>
@@ -819,25 +945,40 @@
     
     <header class="forge-header">
         <h1>QR<span class="accent">Forge</span></h1>
-        <p>Generate QR codes in seconds — no signup required</p>
+        <p>Generate stylish QR codes in seconds — no signup required</p>
     </header>
     
     <main class="container">
         <div class="forge-card">
             <div class="qr-container">
                 <div class="qr-form">
+                    <!-- Type Tabs -->
                     <div class="type-tabs">
-                        <button class="active" data-type="url">URL</button>
-                        <button data-type="text">Text</button>
-                        <button data-type="wifi">WiFi</button>
-                        <button data-type="contact">Contact</button>
+                        <button class="active" data-type="url">🔗 URL</button>
+                        <button data-type="text">📝 Text</button>
+                        <button data-type="wifi">📶 WiFi</button>
+                        <button data-type="contact">👤 vCard</button>
                     </div>
                     
+                    <!-- Batch Mode Toggle -->
+                    <label class="batch-toggle" id="batchToggle">
+                        <input type="checkbox" id="batchMode">
+                        <span>📦 Batch Mode — generate multiple QR codes at once</span>
+                    </label>
+                    
+                    <!-- Standard URL/Text Input -->
                     <div id="url-input">
                         <label for="content">URL or Text</label>
                         <input type="text" id="content" placeholder="https://example.com" value="https://example.com">
                     </div>
                     
+                    <!-- Batch Input -->
+                    <div class="batch-fields" id="batch-fields">
+                        <label for="batchContent">Enter multiple URLs (one per line)</label>
+                        <textarea id="batchContent" rows="5" placeholder="https://example.com&#10;https://google.com&#10;https://github.com"></textarea>
+                    </div>
+                    
+                    <!-- WiFi Fields -->
                     <div class="wifi-fields" id="wifi-fields">
                         <label for="wifi-ssid">Network Name (SSID)</label>
                         <input type="text" id="wifi-ssid" placeholder="MyWiFi">
@@ -847,90 +988,142 @@
                         <select id="wifi-encryption">
                             <option value="WPA">WPA/WPA2</option>
                             <option value="WEP">WEP</option>
-                            <option value="nopass">None</option>
+                            <option value="nopass">None (Open)</option>
                         </select>
+                        <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer;">
+                            <input type="checkbox" id="wifi-hidden" style="width: auto; margin: 0;">
+                            Hidden Network
+                        </label>
                     </div>
                     
+                    <!-- vCard Fields -->
                     <div class="contact-fields" id="contact-fields">
                         <label for="contact-name">Full Name</label>
                         <input type="text" id="contact-name" placeholder="John Doe">
+                        <label for="contact-org">Organization</label>
+                        <input type="text" id="contact-org" placeholder="Company Inc.">
+                        <label for="contact-title">Job Title</label>
+                        <input type="text" id="contact-title" placeholder="Software Engineer">
                         <label for="contact-phone">Phone</label>
                         <input type="text" id="contact-phone" placeholder="+1234567890">
                         <label for="contact-email">Email</label>
                         <input type="email" id="contact-email" placeholder="john@example.com">
+                        <label for="contact-url">Website</label>
+                        <input type="url" id="contact-url" placeholder="https://johndoe.com">
+                        <label for="contact-address">Address</label>
+                        <textarea id="contact-address" rows="2" placeholder="123 Main St, City, State"></textarea>
                     </div>
                     
-                    <details>
-                        <summary>🎨 Customize Colors <span class="pro-badge" onclick="event.stopPropagation(); showProModal()">✨ PRO</span></summary>
-                        <div class="color-inputs">
-                            <label>
-                                Foreground
-                                <input type="color" id="fg-color" value="#000000">
-                            </label>
-                            <label>
-                                Background
-                                <input type="color" id="bg-color" value="#ffffff">
-                            </label>
-                        </div>
-                    </details>
+                    <!-- Styling Options -->
+                    <h3 class="section-title"><span>🎨</span> Style</h3>
                     
-                    <details>
-                        <summary>📐 Size & Error Correction <span class="pro-badge" onclick="event.stopPropagation(); showProModal()">✨ PRO</span></summary>
-                        <div>
-                            <label for="size">Size</label>
-                            <select id="size">
-                                <option value="4">Small (132px)</option>
-                                <option value="6" selected>Medium (198px)</option>
-                                <option value="8">Large (264px)</option>
-                                <option value="10">Extra Large (330px) — Pro</option>
-                            </select>
-                            <label for="error-correction">Error Correction</label>
-                            <select id="error-correction">
-                                <option value="L">Low (7%)</option>
-                                <option value="M" selected>Medium (15%)</option>
-                                <option value="Q">Quartile (25%)</option>
-                                <option value="H">High (30%) — Pro</option>
-                            </select>
+                    <label>Dot Style</label>
+                    <div class="style-grid">
+                        <div class="style-option active" data-style="square" onclick="selectDotStyle('square')">
+                            <span>⬛</span>
+                            <small>Square</small>
                         </div>
-                    </details>
+                        <div class="style-option" data-style="rounded" onclick="selectDotStyle('rounded')">
+                            <span>🔲</span>
+                            <small>Rounded</small>
+                        </div>
+                        <div class="style-option" data-style="circle" onclick="selectDotStyle('circle')">
+                            <span>⚫</span>
+                            <small>Circle</small>
+                        </div>
+                    </div>
+                    
+                    <label>Corner Style</label>
+                    <div class="style-grid">
+                        <div class="style-option active" data-corner="square" onclick="selectCornerStyle('square')">
+                            <span>⬜</span>
+                            <small>Sharp</small>
+                        </div>
+                        <div class="style-option" data-corner="rounded" onclick="selectCornerStyle('rounded')">
+                            <span>◻️</span>
+                            <small>Rounded</small>
+                        </div>
+                        <div class="style-option" data-corner="extra" onclick="selectCornerStyle('extra')">
+                            <span>🔳</span>
+                            <small>Extra</small>
+                        </div>
+                    </div>
+                    
+                    <div class="color-row">
+                        <div>
+                            <label for="fg-color">Foreground Color</label>
+                            <input type="color" id="fg-color" value="#000000">
+                        </div>
+                        <div>
+                            <label for="bg-color">Background Color</label>
+                            <input type="color" id="bg-color" value="#ffffff">
+                        </div>
+                    </div>
+                    
+                    <!-- Logo Embed -->
+                    <div class="logo-upload-section">
+                        <label>Logo Overlay <span class="pro-badge" onclick="showProModal()">✨ PRO</span></label>
+                        <div class="logo-upload" id="logoUpload" onclick="document.getElementById('logoInput').click()">
+                            <input type="file" id="logoInput" accept="image/*" onchange="handleLogoUpload(event)">
+                            <div id="logoPreview">
+                                <p class="logo-upload-text">📷 <span>Upload logo</span> to embed in center</p>
+                            </div>
+                        </div>
+                    </div>
                     
                     <button class="btn btn-primary" onclick="generateQR()">⚡ Generate QR Code</button>
                 </div>
                 
                 <div class="qr-preview">
                     <h3>Preview</h3>
-                    <div id="qrcode"></div>
-                    <div class="btn-group">
-                        <button class="btn btn-secondary" onclick="downloadQR('png')">📥 PNG</button>
-                        <button class="btn btn-secondary" onclick="downloadQR('svg')">📥 SVG</button>
+                    <div id="qrcode" style="background: #ffffff;"></div>
+                    
+                    <div class="download-section">
+                        <span class="download-size-label">Download Size</span>
+                        <div class="size-buttons">
+                            <button class="size-btn" data-size="200">200px</button>
+                            <button class="size-btn active" data-size="500">500px</button>
+                            <button class="size-btn" data-size="1000">1000px</button>
+                            <button class="size-btn" data-size="2000">2000px</button>
+                        </div>
+                        
+                        <div class="btn-group">
+                            <button class="btn btn-secondary" onclick="downloadQR('png')">📥 PNG</button>
+                            <button class="btn btn-secondary" onclick="downloadQR('svg')">📥 SVG</button>
+                            <button class="btn btn-secondary" onclick="downloadQR('pdf')">📥 PDF</button>
+                        </div>
                     </div>
+                    
                     <p class="usage-counter"><span class="count" id="usage-count">5</span> free QR codes remaining today</p>
                 </div>
             </div>
+            
+            <!-- Batch Results -->
+            <div class="batch-results" id="batchResults" style="display: none;"></div>
         </div>
         
         <div class="watermark">
             <p>⭐ <strong>Free tier:</strong> 5 QR codes per day</p>
-            <p><a href="#" onclick="showProModal(); return false;">Upgrade to Pro</a> for unlimited QR codes, high-res export & custom colors</p>
+            <p><a href="#" onclick="showProModal(); return false;">Upgrade to Pro</a> for unlimited QR codes, high-res export & logo embedding</p>
         </div>
         
         <div class="forge-card">
             <div class="features">
                 <div class="feature">
                     <h4>🔗 Multiple Formats</h4>
-                    <p>URLs, text, WiFi networks, contact cards</p>
+                    <p>URLs, text, WiFi networks, vCards with full details</p>
                 </div>
                 <div class="feature">
-                    <h4>🎨 Customizable</h4>
-                    <p>Colors, sizes, error correction levels</p>
+                    <h4>🎨 Custom Styles</h4>
+                    <p>Dot shapes, corner styles, colors</p>
                 </div>
                 <div class="feature">
-                    <h4>📥 Easy Download</h4>
-                    <p>PNG and SVG formats</p>
+                    <h4>📥 Multiple Sizes</h4>
+                    <p>200px to 2000px, PNG/SVG/PDF</p>
                 </div>
                 <div class="feature" style="cursor: pointer;" onclick="showProModal()">
-                    <h4>📊 High-Res <span class="pro-badge">✨ PRO</span></h4>
-                    <p>4K export, bulk generation, analytics</p>
+                    <h4>📦 Batch Mode <span class="pro-badge">✨ PRO</span></h4>
+                    <p>Generate multiple QR codes at once</p>
                 </div>
             </div>
         </div>
@@ -943,9 +1136,10 @@
             <div class="pro-price">$2.99 <span>one-time</span></div>
             <ul class="pro-features">
                 <li>Unlimited QR codes forever</li>
-                <li>High-res 4K export</li>
-                <li>Custom colors & branding</li>
-                <li>Bulk generation</li>
+                <li>High-res 4K export (2000px+)</li>
+                <li>Logo embedding in QR center</li>
+                <li>Batch generation (up to 50)</li>
+                <li>Custom colors & all styles</li>
                 <li>Priority support</li>
             </ul>
             <div class="modal-actions">
@@ -972,13 +1166,19 @@
             </div>
             <div class="forge-footer-meta">
                 <p>Made with 🔥 by <a href="https://github.com/Simplereally">Simplereally</a></p>
-            <p style="margin-top: var(--space-sm);"><a href="https://simplereally.github.io/aitoolsmith/articles/best-free-qr-code-generators-2026.html" style="color: var(--forge-ember); text-decoration: none;">📖 Read: Best Free QR Code Generators 2026</a></p>
+                <p style="margin-top: var(--space-sm);"><a href="https://simplereally.github.io/aitoolsmith/articles/best-free-qr-code-generators-2026.html" style="color: var(--forge-ember); text-decoration: none;">📖 Read: Best Free QR Code Generators 2026</a></p>
             </div>
         </div>
     </footer>
     
     <script>
+        const { jsPDF } = window.jspdf;
+        
         let currentType = 'url';
+        let currentDotStyle = 'square';
+        let currentCornerStyle = 'square';
+        let downloadSize = 500;
+        let uploadedLogo = null;
         let dailyCount = parseInt(localStorage.getItem('qr_daily_count') || '0');
         let lastDate = localStorage.getItem('qr_last_date');
         const today = new Date().toDateString();
@@ -998,20 +1198,85 @@
                 btn.classList.add('active');
                 currentType = btn.dataset.type;
                 
-                document.getElementById('url-input').style.display = currentType === 'url' || currentType === 'text' ? 'block' : 'none';
+                const isBatch = document.getElementById('batchMode').checked;
+                document.getElementById('url-input').style.display = !isBatch && (currentType === 'url' || currentType === 'text') ? 'block' : 'none';
+                document.getElementById('batch-fields').classList.toggle('active', isBatch && (currentType === 'url' || currentType === 'text'));
                 document.getElementById('wifi-fields').classList.toggle('active', currentType === 'wifi');
                 document.getElementById('contact-fields').classList.toggle('active', currentType === 'contact');
+                document.getElementById('batchToggle').style.display = (currentType === 'url' || currentType === 'text') ? 'flex' : 'none';
                 
                 if (currentType === 'text') {
                     document.getElementById('content').placeholder = 'Enter any text...';
                 } else if (currentType === 'url') {
                     document.getElementById('content').placeholder = 'https://example.com';
                 }
+                
+                generateQR();
             });
         });
         
+        // Batch mode toggle
+        document.getElementById('batchMode').addEventListener('change', (e) => {
+            const isBatch = e.target.checked;
+            document.getElementById('url-input').style.display = isBatch ? 'none' : 'block';
+            document.getElementById('batch-fields').classList.toggle('active', isBatch);
+            document.getElementById('batchResults').style.display = isBatch ? 'grid' : 'none';
+            document.querySelector('.qr-preview').style.display = isBatch ? 'none' : 'flex';
+        });
+        
+        // Size buttons
+        document.querySelectorAll('.size-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                downloadSize = parseInt(btn.dataset.size);
+            });
+        });
+        
+        // Style selections
+        function selectDotStyle(style) {
+            currentDotStyle = style;
+            document.querySelectorAll('.style-option[data-style]').forEach(opt => {
+                opt.classList.toggle('active', opt.dataset.style === style);
+            });
+            generateQR();
+        }
+        
+        function selectCornerStyle(style) {
+            currentCornerStyle = style;
+            document.querySelectorAll('.style-option[data-corner]').forEach(opt => {
+                opt.classList.toggle('active', opt.dataset.corner === style);
+            });
+            generateQR();
+        }
+        
+        // Logo upload
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedLogo = e.target.result;
+                    const preview = document.getElementById('logoPreview');
+                    preview.innerHTML = `<img src="${uploadedLogo}" alt="Logo"><button class="remove-logo" onclick="removeLogo(event)">×</button>`;
+                    document.getElementById('logoUpload').classList.add('has-logo');
+                    generateQR();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function removeLogo(event) {
+            event.stopPropagation();
+            uploadedLogo = null;
+            document.getElementById('logoPreview').innerHTML = '<p class="logo-upload-text">📷 <span>Upload logo</span> to embed in center</p>';
+            document.getElementById('logoUpload').classList.remove('has-logo');
+            document.getElementById('logoInput').value = '';
+            generateQR();
+        }
+        
         // Generate QR on input change
-        document.querySelectorAll('input, select').forEach(el => {
+        document.querySelectorAll('input, select, textarea').forEach(el => {
             el.addEventListener('change', generateQR);
             el.addEventListener('input', debounce(generateQR, 300));
         });
@@ -1030,66 +1295,242 @@
                     const ssid = document.getElementById('wifi-ssid').value;
                     const pass = document.getElementById('wifi-password').value;
                     const enc = document.getElementById('wifi-encryption').value;
-                    return `WIFI:T:${enc};S:${ssid};P:${pass};;`;
+                    const hidden = document.getElementById('wifi-hidden').checked;
+                    return `WIFI:T:${enc};S:${ssid};P:${pass};H:${hidden ? 'true' : 'false'};;`;
                 case 'contact':
                     const name = document.getElementById('contact-name').value;
+                    const org = document.getElementById('contact-org').value;
+                    const title = document.getElementById('contact-title').value;
                     const phone = document.getElementById('contact-phone').value;
                     const email = document.getElementById('contact-email').value;
-                    return `BEGIN:VCARD\nVERSION:3.0\nN:${name}\nTEL:${phone}\nEMAIL:${email}\nEND:VCARD`;
+                    const url = document.getElementById('contact-url').value;
+                    const address = document.getElementById('contact-address').value;
+                    let vcard = `BEGIN:VCARD\nVERSION:3.0\n`;
+                    if (name) vcard += `FN:${name}\nN:${name.split(' ').reverse().join(';')};\n`;
+                    if (org) vcard += `ORG:${org}\n`;
+                    if (title) vcard += `TITLE:${title}\n`;
+                    if (phone) vcard += `TEL:${phone}\n`;
+                    if (email) vcard += `EMAIL:${email}\n`;
+                    if (url) vcard += `URL:${url}\n`;
+                    if (address) vcard += `ADR:;;${address.replace(/\n/g, ';')};;;;\n`;
+                    vcard += `END:VCARD`;
+                    return vcard;
                 default:
                     return document.getElementById('content').value;
             }
         }
         
         function generateQR() {
+            const isBatch = document.getElementById('batchMode').checked;
+            
+            if (isBatch && (currentType === 'url' || currentType === 'text')) {
+                generateBatchQR();
+                return;
+            }
+            
             if (dailyCount >= 5) {
-                document.getElementById('qrcode').innerHTML = '<p style="color: var(--forge-heat); padding: 2rem;">Daily limit reached. <a href="#" onclick="showProModal(); return false;" style="color: var(--forge-ember);">Upgrade to Pro</a> for unlimited.</p>';
+                document.getElementById('qrcode').innerHTML = '<p style="color: var(--forge-heat); padding: 2rem; text-align: center;">Daily limit reached. <a href="#" onclick="showProModal(); return false;" style="color: var(--forge-ember);">Upgrade to Pro</a> for unlimited.</p>';
                 return;
             }
             
             const content = getQRContent();
             if (!content) return;
             
-            const size = parseInt(document.getElementById('size').value);
-            const errorLevel = document.getElementById('error-correction').value;
             const fgColor = document.getElementById('fg-color').value;
             const bgColor = document.getElementById('bg-color').value;
             
-            const qr = qrcode(0, errorLevel);
+            // Generate QR data
+            const qr = qrcode(0, 'M');
             qr.addData(content);
             qr.make();
             
             const moduleCount = qr.getModuleCount();
-            const cellSize = size;
-            const margin = cellSize;
-            const imgSize = moduleCount * cellSize + margin * 2;
+            const cellSize = 8;
+            const margin = cellSize * 2;
+            const size = moduleCount * cellSize + margin * 2;
             
             const canvas = document.createElement('canvas');
-            canvas.width = imgSize;
-            canvas.height = imgSize;
+            canvas.width = size;
+            canvas.height = size;
             const ctx = canvas.getContext('2d');
             
+            // Background
             ctx.fillStyle = bgColor;
-            ctx.fillRect(0, 0, imgSize, imgSize);
+            ctx.fillRect(0, 0, size, size);
             
+            // Draw QR modules with style
             ctx.fillStyle = fgColor;
+            const cornerRadius = currentDotStyle === 'rounded' ? cellSize * 0.3 : 
+                                currentDotStyle === 'circle' ? cellSize * 0.5 : 0;
+            
             for (let row = 0; row < moduleCount; row++) {
                 for (let col = 0; col < moduleCount; col++) {
                     if (qr.isDark(row, col)) {
-                        ctx.fillRect(
-                            col * cellSize + margin,
-                            row * cellSize + margin,
-                            cellSize,
-                            cellSize
-                        );
+                        const x = col * cellSize + margin;
+                        const y = row * cellSize + margin;
+                        
+                        if (currentDotStyle === 'circle') {
+                            ctx.beginPath();
+                            ctx.arc(x + cellSize/2, y + cellSize/2, cellSize/2 * 0.85, 0, Math.PI * 2);
+                            ctx.fill();
+                        } else if (currentDotStyle === 'rounded') {
+                            roundRect(ctx, x, y, cellSize, cellSize, cornerRadius);
+                        } else {
+                            ctx.fillRect(x, y, cellSize, cellSize);
+                        }
                     }
                 }
             }
             
+            // Draw corner patterns with style
+            if (currentCornerStyle !== 'square') {
+                drawStyledCorners(ctx, moduleCount, cellSize, margin, fgColor, bgColor);
+            }
+            
+            // Add logo if present
+            if (uploadedLogo) {
+                const img = new Image();
+                img.onload = function() {
+                    const logoSize = size * 0.22;
+                    const logoX = (size - logoSize) / 2;
+                    const logoY = (size - logoSize) / 2;
+                    
+                    // White background for logo
+                    ctx.fillStyle = bgColor;
+                    const padding = 4;
+                    ctx.fillRect(logoX - padding, logoY - padding, logoSize + padding*2, logoSize + padding*2);
+                    
+                    ctx.drawImage(img, logoX, logoY, logoSize, logoSize);
+                    displayQR(canvas);
+                };
+                img.src = uploadedLogo;
+            } else {
+                displayQR(canvas);
+            }
+            
+            // Update background color display
+            document.getElementById('qrcode').style.background = bgColor;
+        }
+        
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            ctx.fill();
+        }
+        
+        function drawStyledCorners(ctx, moduleCount, cellSize, margin, fgColor, bgColor) {
+            const radius = currentCornerStyle === 'extra' ? cellSize * 1.5 : cellSize;
+            
+            // Finder pattern positions (top-left, top-right, bottom-left)
+            const positions = [
+                { x: 0, y: 0 },
+                { x: moduleCount - 7, y: 0 },
+                { x: 0, y: moduleCount - 7 }
+            ];
+            
+            positions.forEach(pos => {
+                const x = pos.x * cellSize + margin;
+                const y = pos.y * cellSize + margin;
+                const outerSize = 7 * cellSize;
+                const innerSize = 3 * cellSize;
+                const centerX = x + outerSize / 2;
+                const centerY = y + outerSize / 2;
+                
+                // Redraw outer square with rounded corners
+                ctx.fillStyle = bgColor;
+                ctx.fillRect(x, y, outerSize, outerSize);
+                
+                ctx.fillStyle = fgColor;
+                roundRect(ctx, x, y, outerSize, outerSize, radius);
+                
+                ctx.fillStyle = bgColor;
+                roundRect(ctx, x + cellSize, y + cellSize, outerSize - 2*cellSize, outerSize - 2*cellSize, radius * 0.6);
+                
+                ctx.fillStyle = fgColor;
+                roundRect(ctx, x + 2*cellSize, y + 2*cellSize, innerSize, innerSize, radius * 0.4);
+            });
+        }
+        
+        function displayQR(canvas) {
             document.getElementById('qrcode').innerHTML = '';
             document.getElementById('qrcode').appendChild(canvas);
+            window.currentQR = canvas;
+        }
+        
+        function generateBatchQR() {
+            const content = document.getElementById('batchContent').value;
+            const urls = content.split('\n').filter(url => url.trim());
             
-            window.currentQR = { canvas, content, moduleCount, cellSize, margin, fgColor, bgColor };
+            if (urls.length === 0) return;
+            if (urls.length > 10 && dailyCount < 5) {
+                alert('Free tier limited to 10 batch items. Upgrade to Pro for up to 50.');
+                urls.length = 10;
+            }
+            
+            const resultsContainer = document.getElementById('batchResults');
+            resultsContainer.innerHTML = '';
+            
+            const fgColor = document.getElementById('fg-color').value;
+            const bgColor = document.getElementById('bg-color').value;
+            
+            urls.forEach((url, index) => {
+                const qr = qrcode(0, 'M');
+                qr.addData(url.trim());
+                qr.make();
+                
+                const moduleCount = qr.getModuleCount();
+                const cellSize = 4;
+                const margin = cellSize;
+                const size = moduleCount * cellSize + margin * 2;
+                
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d');
+                
+                ctx.fillStyle = bgColor;
+                ctx.fillRect(0, 0, size, size);
+                
+                ctx.fillStyle = fgColor;
+                for (let row = 0; row < moduleCount; row++) {
+                    for (let col = 0; col < moduleCount; col++) {
+                        if (qr.isDark(row, col)) {
+                            ctx.fillRect(col * cellSize + margin, row * cellSize + margin, cellSize, cellSize);
+                        }
+                    }
+                }
+                
+                const item = document.createElement('div');
+                item.className = 'batch-item';
+                item.appendChild(canvas);
+                const label = document.createElement('p');
+                label.textContent = url.trim().substring(0, 30) + (url.length > 30 ? '...' : '');
+                item.appendChild(label);
+                
+                // Download button
+                const dlBtn = document.createElement('button');
+                dlBtn.className = 'btn btn-secondary';
+                dlBtn.style.cssText = 'font-size: 0.6rem; padding: 4px 8px; margin-top: 4px;';
+                dlBtn.textContent = '📥';
+                dlBtn.onclick = () => {
+                    const link = document.createElement('a');
+                    link.download = `qr-${index + 1}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                };
+                item.appendChild(dlBtn);
+                
+                resultsContainer.appendChild(item);
+            });
         }
         
         function downloadQR(format) {
@@ -1102,25 +1543,51 @@
             localStorage.setItem('qr_daily_count', dailyCount.toString());
             updateUsageCounter();
             
-            const { canvas, content, moduleCount, cellSize, margin, fgColor, bgColor } = window.currentQR;
+            const sourceCanvas = window.currentQR;
+            const content = getQRContent();
+            
+            // Create scaled canvas for download
+            const scaledCanvas = document.createElement('canvas');
+            scaledCanvas.width = downloadSize;
+            scaledCanvas.height = downloadSize;
+            const ctx = scaledCanvas.getContext('2d');
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(sourceCanvas, 0, 0, downloadSize, downloadSize);
             
             if (format === 'png') {
                 const link = document.createElement('a');
-                link.download = 'qrcode.png';
-                link.href = canvas.toDataURL('image/png');
+                link.download = `qrcode-${downloadSize}px.png`;
+                link.href = scaledCanvas.toDataURL('image/png');
                 link.click();
             } else if (format === 'svg') {
-                let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${canvas.width} ${canvas.height}">`;
-                svg += `<rect width="100%" height="100%" fill="${bgColor}"/>`;
+                // Generate SVG
+                const fgColor = document.getElementById('fg-color').value;
+                const bgColor = document.getElementById('bg-color').value;
                 
-                const qr = qrcode(0, document.getElementById('error-correction').value);
+                const qr = qrcode(0, 'M');
                 qr.addData(content);
                 qr.make();
+                
+                const moduleCount = qr.getModuleCount();
+                const cellSize = downloadSize / (moduleCount + 4);
+                const margin = cellSize * 2;
+                
+                let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${downloadSize} ${downloadSize}">`;
+                svg += `<rect width="100%" height="100%" fill="${bgColor}"/>`;
                 
                 for (let row = 0; row < moduleCount; row++) {
                     for (let col = 0; col < moduleCount; col++) {
                         if (qr.isDark(row, col)) {
-                            svg += `<rect x="${col * cellSize + margin}" y="${row * cellSize + margin}" width="${cellSize}" height="${cellSize}" fill="${fgColor}"/>`;
+                            const x = col * cellSize + margin;
+                            const y = row * cellSize + margin;
+                            
+                            if (currentDotStyle === 'circle') {
+                                svg += `<circle cx="${x + cellSize/2}" cy="${y + cellSize/2}" r="${cellSize/2 * 0.85}" fill="${fgColor}"/>`;
+                            } else if (currentDotStyle === 'rounded') {
+                                svg += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="${cellSize * 0.3}" fill="${fgColor}"/>`;
+                            } else {
+                                svg += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" fill="${fgColor}"/>`;
+                            }
                         }
                     }
                 }
@@ -1128,9 +1595,21 @@
                 
                 const blob = new Blob([svg], { type: 'image/svg+xml' });
                 const link = document.createElement('a');
-                link.download = 'qrcode.svg';
+                link.download = `qrcode-${downloadSize}px.svg`;
                 link.href = URL.createObjectURL(blob);
                 link.click();
+            } else if (format === 'pdf') {
+                const doc = new jsPDF({
+                    orientation: downloadSize > 500 ? 'portrait' : 'portrait',
+                    unit: 'px',
+                    format: [downloadSize + 40, downloadSize + 60]
+                });
+                
+                doc.addImage(scaledCanvas.toDataURL('image/png'), 'PNG', 20, 20, downloadSize, downloadSize);
+                doc.setFontSize(8);
+                doc.setTextColor(150);
+                doc.text('Generated by QRForge', (downloadSize + 40) / 2, downloadSize + 45, { align: 'center' });
+                doc.save(`qrcode-${downloadSize}px.pdf`);
             }
         }
         
